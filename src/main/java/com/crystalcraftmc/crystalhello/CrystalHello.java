@@ -74,8 +74,9 @@ public class CrystalHello extends JavaPlugin {
 				//REQUIRE ITEM: FALSE (1 of 2)
 				if (player.hasPermission("crystalhello.greetings")) {
 					if (this.getConfig().getBoolean("require-item")) {
-
-						if (player.getItemInHand().getType().equals(this.getConfig().get("required-item"))) {
+						int x = this.getConfig().getInt("required-item");
+						Material blockOfChoice = Material.getMaterial(x);
+						if (player.getItemInHand().getType().equals(blockOfChoice)) {
 							Bukkit.broadcastMessage(ChatColor.AQUA + "CrystalCraft has decided to grant the wish trapped deepest in your heart:\n" + "Hello " + player.getName());
 							return true;
 						} else {
