@@ -80,7 +80,7 @@ public class CrystalHello extends JavaPlugin {
 							Bukkit.broadcastMessage(ChatColor.AQUA + "CrystalCraft has decided to grant the wish trapped deepest in your heart:\n" + "Hello " + player.getName());
 							return true;
 						} else {
-							player.sendMessage("This command requires icy hands, not an icy heart!");
+							player.sendMessage(ChatColor.RED + "This command requires icy hands, not an icy heart!");
 							return false;
 						}
 					}
