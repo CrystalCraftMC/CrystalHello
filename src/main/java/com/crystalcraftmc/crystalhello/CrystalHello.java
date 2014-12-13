@@ -59,7 +59,7 @@ public class CrystalHello extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
 		//----------------------------COMMAND (1 of 4)-----------------------------
-		if(cmd.getName().equalsIgnoreCase("crystal")){
+		if(cmd.getName().equalsIgnoreCase("crystal") && args.length == 0){
 
 			//-----------------------NON-PLAYER (2 of 4)---------------------------
 			if(!(sender instanceof Player)){
@@ -90,6 +90,10 @@ public class CrystalHello extends JavaPlugin {
 					}
 				}
 			}
+		} else if (cmd.getName().equalsIgnoreCase("crystal") && args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+			Player player = (Player) sender;
+			this.reloadConfig();
+			player.sendMessage(ChatColor.GRAY + "Configuration reloaded!");
 		}
 		return false;
 	}
