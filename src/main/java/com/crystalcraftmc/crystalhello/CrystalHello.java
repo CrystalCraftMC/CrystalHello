@@ -71,10 +71,30 @@ public class CrystalHello extends JavaPlugin {
 				//REQUIRE PERMISSIONS
 				if (player.hasPermission("crystalhello.greetings")) {
 					//REQUIRE ITEM: TRUE (1 of 2)
+					if (player.hasPermission("crystalhello.greetings")) {
 					if (this.getConfig().getBoolean("require-item")) {
 						if (player.getItemInHand().getType().equals(Material.getMaterial(this.getConfig().getString("required-item")))) {
-							Bukkit.broadcastMessage(ChatColor.valueOf("successful-color") + this.getConfig().getString("successful-message") + player.getName() + "!");
-							return true;
+							//=========================================START OF ITEM CONSUME *(comment for easy find-fix)
+							ItemStack iS = player.getItemInHand();
+							int current = iS.getAmount();
+							if(current < this.getConfig().getInt("amount-required")){
+								player.sendMessage(ChatColor.RED + "You got the right idea, just not the right amount.");
+							} else if(current >= this.getConfig().getInt("amount-required")){
+								int newAmount = current - this.getConfig().getInt("amount-required");
+								if (newAmount > 0){
+									iS.setAmount(newAmount);
+									return true;
+								} else if (newAmount == 0){
+									PlayerInventory inv = player.getInventory();
+									inv.remove(iS);
+									Bukkit.broadcastMessage(ChatColor.valueOf("successful-color") + this.getConfig().getString("successful-message") + player.getName() + "!");
+									return true;
+								} else {
+									Bukkit.broadcastMessage(ChatColor.DARK_RED + "DEBUG:" + ChatColor.RED + "There is a problem. See: CrystalHello");
+									return false;
+									//=========================================END OF ITEM CONSUME *(comment for easy find-fix) maybe add code to stop plugin - what do you think Justin?
+								}
+							}
 						} else {
 							player.sendMessage(ChatColor.valueOf("failed-color") + this.getConfig().getString("failed-message"));
 							return false;
