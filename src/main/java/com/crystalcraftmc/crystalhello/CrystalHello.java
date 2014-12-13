@@ -40,62 +40,65 @@ import java.io.File;
 
 
 public class CrystalHello extends JavaPlugin {
-    public void onEnable() {
-        getLogger().info(ChatColor.AQUA + "CrystalHello has been initialized!");
+	public void onEnable() {
+		getLogger().info(ChatColor.AQUA + "CrystalHello has been initialized!");
 
-        // Here, we are checking to see if a config.yml already exists. If no, generate a new one!
-        try {
-            File database = new File(getDataFolder(), "config.yml");
-            if (!database.exists()) saveDefaultConfig();
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-    }
+		// Here, we are checking to see if a config.yml already exists. If no, generate a new one!
+		try {
+			File database = new File(getDataFolder(), "config.yml");
+			if (!database.exists()) saveDefaultConfig();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+	}
 
-    public void onDisable() {
-        getLogger().info(ChatColor.AQUA + "CrystalHello has been stopped by the server.");
-    }
+	public void onDisable() {
+		getLogger().info(ChatColor.AQUA + "CrystalHello has been stopped by the server.");
+	}
 
-    //Command Handling
+	//Command Handling
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
-		//----------------------------COMMAND (1 of 4)-----------------------------
+		//----------------------------PLAYER: COMMAND (1 of 3)-----------------------------
 		if(cmd.getName().equalsIgnoreCase("crystal") && args.length == 0){
 
-			//-----------------------NON-PLAYER (2 of 4)---------------------------
+			//-----------------------PLAYER: FALSE (2 of 3)---------------------------
 			if(!(sender instanceof Player)){
 				sender.sendMessage("You must be a player to use this command.");
 				return false;
 			} 
-			//------------------------PLAYER (3 of 4) [and] ICE Check (4 of 4)---------------------------
+			//------------------------PLAYER: TRUE (3 of 3)<><><><><>COMMAND REQUIREMENTS: (0 of 5)---------------------------
 			else {
 				Player player = (Player) sender;
-				//REQUIRE PERMISSIONS
-				if (player.hasPermission("crystalhello.greetings")) {
-					//REQUIRE ITEM: TRUE (1 of 2)
-					if (player.hasPermission("crystalhello.greetings")) {
+				//------------------COMMAND REQUIRE: PERMISSIONS (1 of 5)
+				if (player.hasPermission("crystalhello.greetings")) { 
+					//---------------COMMAND REQUIRE: ITEM: TRUE (2 of 5)
 					if (this.getConfig().getBoolean("require-item")) {
 						if (player.getItemInHand().getType().equals(Material.getMaterial(this.getConfig().getString("required-item")))) {
-							//=========================================START OF ITEM CONSUME *(comment for easy find-fix)
 							ItemStack iS = player.getItemInHand();
 							int current = iS.getAmount();
+							//COMMAND REQUIRE: HAVE # ITEMS: FALSE (3 of 5) {***START OF ITEM CONSUME***}
 							if(current < this.getConfig().getInt("amount-required")){
 								player.sendMessage(ChatColor.RED + "You got the right idea, just not the right amount.");
-							} else if(current >= this.getConfig().getInt("amount-required")){
+							} 
+							//COMMAND REQUIRE: HAVE # ITEMS: TRUE (4 of 5)
+							else if(current >= this.getConfig().getInt("amount-required")){
 								int newAmount = current - this.getConfig().getInt("amount-required");
 								if (newAmount > 0){
 									iS.setAmount(newAmount);
+									Bukkit.broadcastMessage(ChatColor.valueOf("successful-color") + this.getConfig().getString("successful-message") + player.getName() + "!");
 									return true;
 								} else if (newAmount == 0){
 									PlayerInventory inv = player.getInventory();
-									inv.remove(iS);
+									//inv.remove(iS); //****RISKY REPLACED INV.GET-ITEM-IN-HAND() - WILL REPLACE IF FAILS
+									player.getItemInHand().remove(iS);
 									Bukkit.broadcastMessage(ChatColor.valueOf("successful-color") + this.getConfig().getString("successful-message") + player.getName() + "!");
 									return true;
-								} else {
+								} else {// This should not fire unless the newAmount is less than 0, which is a big problem
 									Bukkit.broadcastMessage(ChatColor.DARK_RED + "DEBUG:" + ChatColor.RED + "There is a problem. See: CrystalHello");
 									return false;
-									//=========================================END OF ITEM CONSUME *(comment for easy find-fix) maybe add code to stop plugin - what do you think Justin?
+									//========================================={***END OF ITEM CONSUME***} (Maybe add code to stop plugin - what do you think Justin?)
 								}
 							}
 						} else {
@@ -103,20 +106,21 @@ public class CrystalHello extends JavaPlugin {
 							return false;
 						}
 					}
-					//REQUIRE ITEM: FALSE (2 of 2)
+					//COMMAND REQUIRE: ITEM: FALSE (5 of 5)
 					else if (!this.getConfig().getBoolean("require-item")) {
 						Bukkit.broadcastMessage(ChatColor.valueOf("successful-color") + this.getConfig().getString("successful-message") + player.getName() + "!");
 						return true;
 					}
 				}
+			} 
+			//COMMAND REQUIRE: (N/A)<><><><><><> RELOAD command REQUIRE: OP (1 of 1)
+			else if (cmd.getName().equalsIgnoreCase("crystal") && args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+				Player player = (Player) sender;
+				if(player.isOp()){
+					this.reloadConfig();
+					player.sendMessage(ChatColor.GRAY + "Configuration reloaded!");
+				}
 			}
-		} else if (cmd.getName().equalsIgnoreCase("crystal") && args.length == 1 && args[0].equalsIgnoreCase("reload")) {
-			Player player = (Player) sender;
-			if(player.isOp()){
-			this.reloadConfig();
-			player.sendMessage(ChatColor.GRAY + "Configuration reloaded!");
-			}
+			return false;
 		}
-		return false;
 	}
-}
