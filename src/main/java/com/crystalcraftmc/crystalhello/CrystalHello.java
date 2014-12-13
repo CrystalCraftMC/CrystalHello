@@ -27,7 +27,6 @@ package com.crystalcraftmc.crystalhello;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -76,7 +75,7 @@ public class CrystalHello extends JavaPlugin {
 				if (player.hasPermission("crystalhello.greetings")) {
 					if (this.getConfig().getBoolean("require-item")) {
 
-						if (player.getItemInHand().getType().equals(Material.ICE)) {
+						if (player.getItemInHand().getType().equals(this.getConfig().get("required-item"))) {
 							Bukkit.broadcastMessage(ChatColor.AQUA + "CrystalCraft has decided to grant the wish trapped deepest in your heart:\n" + "Hello " + player.getName());
 							return true;
 						} else {
