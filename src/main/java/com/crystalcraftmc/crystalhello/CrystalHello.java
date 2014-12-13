@@ -53,7 +53,7 @@ public class CrystalHello extends JavaPlugin {
     }
 
     // So far: basic online of a few main command checks and (hopefully)
-    // some code that will determine whether player is holding ice.
+    /// some code that will determine whether player is holding ice.
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
@@ -63,25 +63,33 @@ public class CrystalHello extends JavaPlugin {
 			//-----------------------NON-PLAYER (2 of 4)---------------------------
 			if(!(sender instanceof Player)){
 				//maybe additional statements
-				sender.sendMessage("You are not a player.");
+				sender.sendMessage("You must be a player to use this command.");
 				return false;
 			} 
 			//------------------------PLAYER (3 of 4) [and] ICE Check (4 of 4)---------------------------
 			//Note there is no specific check for (sender instanceof Player) Just the confirmation that it is not- a non-player
 			else {
-				sender.sendMessage("You are a player.");
 				Player player = (Player) sender;
-				//if .getItemInHand().getData is equal to "ICE" Then this should work. I don't know for sure though.
-				//.getItemInHand might work by itself if .getData() has an undesired data type (effect).
-				if(player.getItemInHand().equals(Material.ICE)){
-					player.sendMessage("Your hands must be cold, after holding that ice for so long.");
-				//This line/area here is reserved for what ever happens when the command, ice in hand, and player come together
-					return true;
-				} else {
-					player.sendMessage("This command requires icy hands, not an icy heart! You need to hold some ice.");
-					return false;
-				} 
-			} 
+				//REQUIRE PERMISSIONS
+				if (player.hasPermission("crystalhello.greetings")) {
+					//REQUIRE ITEM: FALSE (1 of 2)
+					if(this.getConfig().getBoolean("require-item") == true){
+
+						if(player.getItemInHand().equals(Material.ICE)){
+							Bukkit.broadcastMessage(ChatColor.AQUA + "CrystalCraft has decided to grant the wish trapped deepest in your heart:\n" + "Hello " + player.getName());
+							return true;
+						} else {
+							player.sendMessage("This command requires icy hands, not an icy heart!");
+							return false;
+						}
+					}
+					//REQUIRE ITEM: TRUE (2 of 2)
+					else if(this.getConfig().getBoolean("require-item")== false){
+						Bukkit.broadcastMessage(ChatColor.AQUA + "CrystalCraft has decided to grant the wish trapped deepest in your heart:\n" + "Hello " + player.getName());
+						return true;
+					}
+				}
+			}
 		}
 		return false;
 	}
