@@ -10,7 +10,6 @@ commands:
     description: See if the server feels like saying hello!
     aliases: [ccmc, crystalcraftmc]
     permission: crystalhello.greetings
-    usage: "Uh-oh, seems like you mistyped. Did you mean /crystal?"
 
 permissions:
   crystalhello.greetings:
