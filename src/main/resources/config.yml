@@ -1,6 +1,7 @@
 # Configure CrystalHello below.
 require-item: true
 required-item: ICE #name = ALL_CAPS
+amount-comsumed: 1 #the absolute value of the amount of the required-item that you want to be comsumed upon command.
 successful-message: CrystalCraftMC has decided to grant the wish trapped deepest in your heart:\nHello, #Player's name will be added here inside the code + "!"
 failed-message: This command requires... more creative from us! #This sends a message directly to the player.
 successful-color: AQUA #color = ALL CAPS
