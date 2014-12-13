@@ -1,3 +1,17 @@
 name: CrystalHello
 main: com.crystalcraftmc.crystalhello.CrystalHello
-version: 0.1
+version: 0.2
+description: Have the server say hello when you type the command and hold an item!
+authors: [jflory7, Jacc734, devastator10k]
+website: http://crystalcraftmc.com
+
+commands:
+  crystal:
+    description: See if the server feels like saying hello!
+    aliases: [ccmc, crystalcraftmc]
+    permission: crystalhello.greetings
+
+permissions:
+  crystalhello.greetings:
+    description: See if the server feels like saying hello!
+    default: true
