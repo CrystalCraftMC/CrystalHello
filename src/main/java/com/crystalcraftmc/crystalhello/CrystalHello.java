@@ -83,7 +83,7 @@ public class CrystalHello extends JavaPlugin {
 							return false;
 						}
 					}
-//REQUIRE ITEM: TRUE (2 of 2)
+					//REQUIRE ITEM: TRUE (2 of 2)
 					else if (!this.getConfig().getBoolean("require-item")) {
 						Bukkit.broadcastMessage(ChatColor.AQUA + "CrystalCraft has decided to grant the wish trapped deepest in your heart:\n" + "Hello " + player.getName());
 						return true;
@@ -93,5 +93,4 @@ public class CrystalHello extends JavaPlugin {
 		}
 		return false;
 	}
-    // See here(http://wiki.bukkit.org/Plugin_Tutorial) for extra help!
 }
