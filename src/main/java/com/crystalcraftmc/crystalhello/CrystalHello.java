@@ -25,6 +25,7 @@
 
 package com.crystalcraftmc.crystalhello;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -71,11 +72,11 @@ public class CrystalHello extends JavaPlugin {
 			else {
 				Player player = (Player) sender;
 				//REQUIRE PERMISSIONS
+				//REQUIRE ITEM: FALSE (1 of 2)
 				if (player.hasPermission("crystalhello.greetings")) {
-					//REQUIRE ITEM: FALSE (1 of 2)
-					if(this.getConfig().getBoolean("require-item") == true){
+					if (this.getConfig().getBoolean("require-item")) {
 
-						if(player.getItemInHand().equals(Material.ICE)){
+						if (player.getItemInHand().equals(Material.ICE)) {
 							Bukkit.broadcastMessage(ChatColor.AQUA + "CrystalCraft has decided to grant the wish trapped deepest in your heart:\n" + "Hello " + player.getName());
 							return true;
 						} else {
@@ -83,8 +84,8 @@ public class CrystalHello extends JavaPlugin {
 							return false;
 						}
 					}
-					//REQUIRE ITEM: TRUE (2 of 2)
-					else if(this.getConfig().getBoolean("require-item")== false){
+//REQUIRE ITEM: TRUE (2 of 2)
+					else if (!this.getConfig().getBoolean("require-item")) {
 						Bukkit.broadcastMessage(ChatColor.AQUA + "CrystalCraft has decided to grant the wish trapped deepest in your heart:\n" + "Hello " + player.getName());
 						return true;
 					}
