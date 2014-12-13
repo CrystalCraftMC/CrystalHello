@@ -53,8 +53,7 @@ public class CrystalHello extends JavaPlugin {
         getLogger().info(ChatColor.AQUA + "CrystalHello has been stopped by the server.");
     }
 
-    // So far: basic online of a few main command checks and (hopefully)
-    /// some code that will determine whether player is holding ice.
+    //Command Handling
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
@@ -63,37 +62,37 @@ public class CrystalHello extends JavaPlugin {
 
 			//-----------------------NON-PLAYER (2 of 4)---------------------------
 			if(!(sender instanceof Player)){
-				//maybe additional statements
 				sender.sendMessage("You must be a player to use this command.");
 				return false;
 			} 
 			//------------------------PLAYER (3 of 4) [and] ICE Check (4 of 4)---------------------------
-			//Note there is no specific check for (sender instanceof Player) Just the confirmation that it is not- a non-player
 			else {
 				Player player = (Player) sender;
 				//REQUIRE PERMISSIONS
-				//REQUIRE ITEM: FALSE (1 of 2)
 				if (player.hasPermission("crystalhello.greetings")) {
+					//REQUIRE ITEM: TRUE (1 of 2)
 					if (this.getConfig().getBoolean("require-item")) {
 						if (player.getItemInHand().getType().equals(Material.getMaterial(this.getConfig().getString("required-item")))) {
-							Bukkit.broadcastMessage(ChatColor.AQUA + "CrystalCraftMC has decided to grant the wish trapped deepest in your heart:\n" + "Hello, " + player.getName() + "!");
+							Bukkit.broadcastMessage(ChatColor.valueOf("successful-color") + this.getConfig().getString("successful-message") + player.getName() + "!");
 							return true;
 						} else {
-							player.sendMessage(ChatColor.RED + "This command requires... more creative from us!");
+							player.sendMessage(ChatColor.valueOf("failed-color") + this.getConfig().getString("failed-message"));
 							return false;
 						}
 					}
-					//REQUIRE ITEM: TRUE (2 of 2)
+					//REQUIRE ITEM: FALSE (2 of 2)
 					else if (!this.getConfig().getBoolean("require-item")) {
-						Bukkit.broadcastMessage(ChatColor.AQUA + "CrystalCraftMC has decided to grant the wish trapped deepest in your heart:\n" + "Hello, " + player.getName() + "!");
+						Bukkit.broadcastMessage(ChatColor.valueOf("successful-color") + this.getConfig().getString("successful-message") + player.getName() + "!");
 						return true;
 					}
 				}
 			}
 		} else if (cmd.getName().equalsIgnoreCase("crystal") && args.length == 1 && args[0].equalsIgnoreCase("reload")) {
 			Player player = (Player) sender;
+			if(player.isOp()){
 			this.reloadConfig();
 			player.sendMessage(ChatColor.GRAY + "Configuration reloaded!");
+			}
 		}
 		return false;
 	}
