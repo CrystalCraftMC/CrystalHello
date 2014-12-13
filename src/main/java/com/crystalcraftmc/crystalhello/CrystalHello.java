@@ -76,7 +76,7 @@ public class CrystalHello extends JavaPlugin {
 				if (player.hasPermission("crystalhello.greetings")) {
 					if (this.getConfig().getBoolean("require-item")) {
 						if (player.getItemInHand().getType().equals(Material.getMaterial(this.getConfig().getString("required-item")))) {
-							Bukkit.broadcastMessage(ChatColor.AQUA + "CrystalCraft has decided to grant the wish trapped deepest in your heart:\n" + "Hello " + player.getName());
+							Bukkit.broadcastMessage(ChatColor.AQUA + "CrystalCraftMC has decided to grant the wish trapped deepest in your heart:\n" + "Hello, " + player.getName() + "!");
 							return true;
 						} else {
 							player.sendMessage(ChatColor.RED + "This command requires icy hands, not an icy heart!");
@@ -85,7 +85,7 @@ public class CrystalHello extends JavaPlugin {
 					}
 					//REQUIRE ITEM: TRUE (2 of 2)
 					else if (!this.getConfig().getBoolean("require-item")) {
-						Bukkit.broadcastMessage(ChatColor.AQUA + "CrystalCraft has decided to grant the wish trapped deepest in your heart:\n" + "Hello " + player.getName());
+						Bukkit.broadcastMessage(ChatColor.AQUA + "CrystalCraftMC has decided to grant the wish trapped deepest in your heart:\n" + "Hello, " + player.getName() + "!");
 						return true;
 					}
 				}
