@@ -59,7 +59,7 @@ public class CrystalHello extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
 		//----------------------------COMMAND (1 of 4)-----------------------------
-		if(cmd.getName().equalsIgnoreCase("<command name> needs to be added to our (title goes here).yml file")){
+		if(cmd.getName().equalsIgnoreCase("crystal")){
 
 			//-----------------------NON-PLAYER (2 of 4)---------------------------
 			if(!(sender instanceof Player)){
