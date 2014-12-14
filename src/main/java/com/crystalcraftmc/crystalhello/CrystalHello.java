@@ -78,6 +78,7 @@ public class CrystalHello extends JavaPlugin {
 						if (player.getItemInHand().getType().equals(Material.getMaterial(this.getConfig().getString("required-item")))) {
 							ItemStack iS = player.getItemInHand();
 							int current = iS.getAmount();
+							Bukkit.broadcastMessage(ChatColor.DARK_RED + "Debug: did we get a number from our config file? " + current);
 							//COMMAND REQUIRE: HAVE # ITEMS: FALSE (3 of 5) {***START OF ITEM CONSUME***}
 							if (current < this.getConfig().getInt("amount-required")) {
 								player.sendMessage(ChatColor.RED + "You got the right idea, just not the right amount.");
