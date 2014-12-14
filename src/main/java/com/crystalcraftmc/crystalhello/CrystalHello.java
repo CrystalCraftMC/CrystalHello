@@ -61,38 +61,38 @@ public class CrystalHello extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
 		//----------------------------PLAYER: COMMAND (1 of 3)-----------------------------
-		if(cmd.getName().equalsIgnoreCase("crystal") && args.length == 0){
+		if (cmd.getName().equalsIgnoreCase("crystal") && args.length == 0) {
 
 			//-----------------------PLAYER: FALSE (2 of 3)---------------------------
-			if(!(sender instanceof Player)){
+			if (!(sender instanceof Player)) {
 				sender.sendMessage("You must be a player to use this command.");
 				return false;
-			} 
+			}
 			//------------------------PLAYER: TRUE (3 of 3)<><><><><>COMMAND REQUIREMENTS: (0 of 5)---------------------------
 			else {
 				Player player = (Player) sender;
 				//------------------COMMAND REQUIRE: PERMISSIONS (1 of 5)
-				if (player.hasPermission("crystalhello.greetings")) { 
+				if (player.hasPermission("crystalhello.greetings")) {
 					//---------------COMMAND REQUIRE: ITEM: TRUE (2 of 5)
 					if (this.getConfig().getBoolean("require-item")) {
 						if (player.getItemInHand().getType().equals(Material.getMaterial(this.getConfig().getString("required-item")))) {
 							ItemStack iS = player.getItemInHand();
 							int current = iS.getAmount();
 							//COMMAND REQUIRE: HAVE # ITEMS: FALSE (3 of 5) {***START OF ITEM CONSUME***}
-							if(current < this.getConfig().getInt("amount-required")){
+							if (current < this.getConfig().getInt("amount-required")) {
 								player.sendMessage(ChatColor.RED + "You got the right idea, just not the right amount.");
-							} 
+							}
 							//COMMAND REQUIRE: HAVE # ITEMS: TRUE (4 of 5)
-							else if(current >= this.getConfig().getInt("amount-required")){
+							else if (current >= this.getConfig().getInt("amount-required")) {
 								int newAmount = current - this.getConfig().getInt("amount-required");
-								if (newAmount > 0){
+								if (newAmount > 0) {
 									iS.setAmount(newAmount);
 									Bukkit.broadcastMessage(ChatColor.valueOf("successful-color") + this.getConfig().getString("successful-message") + player.getName() + "!");
 									return true;
-								} else if (newAmount == 0){
+								} else if (newAmount == 0) {
 									PlayerInventory inv = player.getInventory();
 									//inv.remove(iS); //****RISKY REPLACED INV.GET-ITEM-IN-HAND() - WILL REPLACE IF FAILS
-									player.getItemInHand().remove(iS);
+									inv.remove(iS);
 									Bukkit.broadcastMessage(ChatColor.valueOf("successful-color") + this.getConfig().getString("successful-message") + player.getName() + "!");
 									return true;
 								} else {// This should not fire unless the newAmount is less than 0, which is a big problem
@@ -112,15 +112,16 @@ public class CrystalHello extends JavaPlugin {
 						return true;
 					}
 				}
-			} 
+			}
+		}
 			//COMMAND REQUIRE: (N/A)<><><><><><> RELOAD command REQUIRE: OP (1 of 1)
 			else if (cmd.getName().equalsIgnoreCase("crystal") && args.length == 1 && args[0].equalsIgnoreCase("reload")) {
 				Player player = (Player) sender;
-				if(player.isOp()){
+				if (player.isOp()) {
 					this.reloadConfig();
 					player.sendMessage(ChatColor.GRAY + "Configuration reloaded!");
 				}
 			}
-			return false;
+		return false;
 		}
 	}
