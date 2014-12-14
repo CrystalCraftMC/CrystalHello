@@ -31,15 +31,14 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import java.io.File;
 
-
-
 public class CrystalHello extends JavaPlugin {
+
 	public void onEnable() {
 		getLogger().info(ChatColor.AQUA + "CrystalHello has been initialized!");
 
@@ -61,68 +60,67 @@ public class CrystalHello extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
 		//----------------------------PLAYER: COMMAND (1 of 3)-----------------------------
-		if (cmd.getName().equalsIgnoreCase("crystal") && args.length == 0) {
-
+		if(cmd.getName().equalsIgnoreCase("crystal") && args.length == 0){
 			//-----------------------PLAYER: FALSE (2 of 3)---------------------------
-			if (!(sender instanceof Player)) {
+			if(!(sender instanceof Player)){
 				sender.sendMessage("You must be a player to use this command.");
 				return false;
-			}
+			} 
 			//------------------------PLAYER: TRUE (3 of 3)<><><><><>COMMAND REQUIREMENTS: (0 of 5)---------------------------
 			else {
 				Player player = (Player) sender;
-				//------------------COMMAND REQUIRE: PERMISSIONS (1 of 5)
+				//------------------COMMAND REQUIRE: PERMISSIONS (1 of 3)
 				if (player.hasPermission("crystalhello.greetings")) {
-					//---------------COMMAND REQUIRE: ITEM: TRUE (2 of 5)
+					//---------------COMMAND REQUIRE: ITEM: TRUE (2 of 3)
 					if (this.getConfig().getBoolean("require-item")) {
 						if (player.getItemInHand().getType().equals(Material.getMaterial(this.getConfig().getString("required-item")))) {
-							ItemStack iS = player.getItemInHand();
-							int current = iS.getAmount();
-							Bukkit.broadcastMessage(ChatColor.DARK_RED + "Debug: did we get a number from our config file? " + current);
-							//COMMAND REQUIRE: HAVE # ITEMS: FALSE (3 of 5) {***START OF ITEM CONSUME***}
-							if (current < this.getConfig().getInt("amount-required")) {
-								player.sendMessage(ChatColor.RED + "You got the right idea, just not the right amount.");
-							}
-							//COMMAND REQUIRE: HAVE # ITEMS: TRUE (4 of 5)
-							else if (current >= this.getConfig().getInt("amount-required")) {
-								int newAmount = current - this.getConfig().getInt("amount-required");
-								if (newAmount > 0) {
-									iS.setAmount(newAmount);
-									Bukkit.broadcastMessage(ChatColor.valueOf("successful-color") + this.getConfig().getString("successful-message") + player.getName() + "!");
-									return true;
-								} else if (newAmount == 0) {
-									PlayerInventory inv = player.getInventory();
-									//inv.remove(iS); //****RISKY REPLACED INV.GET-ITEM-IN-HAND() - WILL REPLACE IF FAILS
-									inv.remove(iS);
-									Bukkit.broadcastMessage(ChatColor.valueOf("successful-color") + this.getConfig().getString("successful-message") + player.getName() + "!");
-									return true;
-								} else {// This should not fire unless the newAmount is less than 0, which is a big problem
-									Bukkit.broadcastMessage(ChatColor.DARK_RED + "DEBUG:" + ChatColor.RED + "There is a problem. See: CrystalHello");
-									return false;
-									//========================================={***END OF ITEM CONSUME***} (Maybe add code to stop plugin - what do you think Justin?)
-								}
-							}
+							removeItems(player.getInventory(), player.getItemInHand().getType(), this.getConfig().getInt("amount-required"));
+							Bukkit.broadcastMessage(ChatColor.valueOf("successful-color") + this.getConfig().getString("successful-message") + player.getName() + "!");
 						} else {
 							player.sendMessage(ChatColor.valueOf("failed-color") + this.getConfig().getString("failed-message"));
 							return false;
 						}
 					}
-					//COMMAND REQUIRE: ITEM: FALSE (5 of 5)
+					//COMMAND REQUIRE: ITEM: FALSE (3 of 3)
 					else if (!this.getConfig().getBoolean("require-item")) {
 						Bukkit.broadcastMessage(ChatColor.valueOf("successful-color") + this.getConfig().getString("successful-message") + player.getName() + "!");
 						return true;
 					}
 				}
-			}
-		}
-			//COMMAND REQUIRE: (N/A)<><><><><><> RELOAD command REQUIRE: OP (1 of 1)
-			else if (cmd.getName().equalsIgnoreCase("crystal") && args.length == 1 && args[0].equalsIgnoreCase("reload")) {
-				Player player = (Player) sender;
-				if (player.isOp()) {
-					this.reloadConfig();
-					player.sendMessage(ChatColor.GRAY + "Configuration reloaded!");
+				//COMMAND REQUIRE: (N/A)<><><><><><> RELOAD command REQUIRE: OP (1 of 1)
+				else if (cmd.getName().equalsIgnoreCase("crystal") && args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+					player = (Player) sender;
+					if(player.isOp()){
+						this.reloadConfig();
+						player.sendMessage(ChatColor.GRAY + "Configuration reloaded!");
+						return true;
+					}
+					else{
+						return false;
+					}
 				}
+				return false;
 			}
-		return false;
 		}
 	}
+
+	public static void removeItems(Inventory inventory, Material type, int amount) {
+		if (amount <= 0) return;
+		int size = inventory.getSize();
+		for (int slot = 0; slot < size; slot++) {
+			ItemStack is = inventory.getItem(slot);
+			if (is == null) continue;
+			if (type == is.getType()) {
+				int newAmount = is.getAmount() - amount;
+				if (newAmount > 0) {
+					is.setAmount(newAmount);
+					break;
+				} else {
+					inventory.clear(slot);
+					amount = -newAmount;
+					if (amount == 0) break;
+				}
+			}
+		}
+	}
+}
