@@ -55,62 +55,29 @@ public class CrystalHello extends JavaPlugin {
 		getLogger().info(ChatColor.AQUA + "CrystalHello has been stopped by the server.");
 	}
 
-	//Command Handling
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-
-		//----------------------------PLAYER: COMMAND (1 of 3)-----------------------------
 		if(cmd.getName().equalsIgnoreCase("crystal") && args.length == 0){
-			//-----------------------PLAYER: FALSE (2 of 3)---------------------------
-			if(!(sender instanceof Player)){
-				sender.sendMessage("You must be a player to use this command.");
-				return false;
-			} 
-			//------------------------PLAYER: TRUE (3 of 3)<><><><><>COMMAND REQUIREMENTS: (0 of 5)---------------------------
-			else {
+
+			if (isPlayer(sender)){
 				Player player = (Player) sender;
-				//------------------COMMAND REQUIRE: PERMISSIONS (1 of 3)
-				if (player.hasPermission("crystalhello.greetings")) {
-					//---------------COMMAND REQUIRE: ITEM: TRUE (2 of 3)
-					if (this.getConfig().getBoolean("require-item")) {
-						if (player.getItemInHand().getType().equals(Material.getMaterial(this.getConfig().getString("required-item")))) {
-							removeItems(player.getInventory(), player.getItemInHand().getType(), this.getConfig().getInt("amount-required"));
-							Bukkit.broadcastMessage(ChatColor.valueOf("successful-color") + this.getConfig().getString("successful-message") + player.getName() + "!");
-						} else {
-							player.sendMessage(ChatColor.valueOf("failed-color") + this.getConfig().getString("failed-message"));
-							return false;
-						}
-					}
-					//COMMAND REQUIRE: ITEM: FALSE (3 of 3)
-					else if (!this.getConfig().getBoolean("require-item")) {
-						Bukkit.broadcastMessage(ChatColor.valueOf("successful-color") + this.getConfig().getString("successful-message") + player.getName() + "!");
-						return true;
-					}
-				}
-				//COMMAND REQUIRE: (N/A)<><><><><><> RELOAD command REQUIRE: OP (1 of 1)
-				else if (cmd.getName().equalsIgnoreCase("crystal") && args.length == 1 && args[0].equalsIgnoreCase("reload")) {
-					player = (Player) sender;
-					if(player.isOp()){
-						this.reloadConfig();
-						player.sendMessage(ChatColor.GRAY + "Configuration reloaded!");
-						return true;
-					}
-					else{
-						return false;
-					}
-				}
-				return false;
+				Material itemType = Material.getMaterial(this.getConfig().getString("required-item"));
+				boolean required = this.getConfig().getBoolean("require-item");
+				int amount = this.getConfig().getInt("amount-required");
+				executeCrystalLogic(required, itemType, player, amount);
+				reloadCrystal(player, cmd, args);
 			}
 		}
+		return false;
 	}
 
-	public static void removeItems(Inventory inventory, Material type, int amount) {
+	public static void removeItem(Inventory inventory, Material itemType, int amount) {
 		if (amount <= 0) return;
 		int size = inventory.getSize();
 		for (int slot = 0; slot < size; slot++) {
 			ItemStack is = inventory.getItem(slot);
 			if (is == null) continue;
-			if (type == is.getType()) {
+			if (itemType == is.getType()) {
 				int newAmount = is.getAmount() - amount;
 				if (newAmount > 0) {
 					is.setAmount(newAmount);
@@ -122,5 +89,46 @@ public class CrystalHello extends JavaPlugin {
 				}
 			}
 		}
+	}
+
+	public boolean executeCrystalLogic(boolean required, Material itemType, Player player, int amount){ //calls removeItem
+		if (player.hasPermission("crystalhello.greetings")) {//permissions start
+			if (required) {//required
+				if (player.getItemInHand().getType().equals(itemType.toString())) {
+					removeItem(player.getInventory(), itemType, amount);
+					Bukkit.broadcastMessage(ChatColor.valueOf("successful-color") + this.getConfig().getString("successful-message") + player.getName() + "!");
+				} 
+				else {
+					player.sendMessage(ChatColor.valueOf("failed-color") + this.getConfig().getString("failed-message"));
+					return false;
+				}
+			}//required ends
+			else if (!required) {//not required
+				Bukkit.broadcastMessage(ChatColor.valueOf("successful-color") + this.getConfig().getString("successful-message") + player.getName() + "!");
+				return true;
+			}//not required ends
+		}//permissions end
+		return false;
+	}//method ends
+
+	public boolean isPlayer(CommandSender sender) {
+		if(!(sender instanceof Player)){
+			sender.sendMessage("You must be a player to use this command.");
+			return false;
+		} else{
+			return true;
+		}		
+	}
+
+	public boolean reloadCrystal(Player player, Command cmd, String[] args){
+		if (cmd.getName().equalsIgnoreCase("crystal") && args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+			if(player.isOp()){
+				this.reloadConfig();
+				player.sendMessage(ChatColor.GRAY + "Configuration reloaded!");
+				return true;
+			}
+			return false;
+		}
+		return false;
 	}
 }
