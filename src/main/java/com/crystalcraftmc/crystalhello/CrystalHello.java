@@ -31,17 +31,14 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 
-public class CrystalHello extends JavaPlugin {
+public class CrystalHelloTestVersion extends JavaPlugin {
 
 	public void onEnable() {
 		getLogger().info(ChatColor.AQUA + "CrystalHello has been initialized!");
-
 		// Here, we are checking to see if a config.yml already exists. If no, generate a new one!
 		try {
 			File database = new File(getDataFolder(), "config.yml");
@@ -55,81 +52,96 @@ public class CrystalHello extends JavaPlugin {
 		getLogger().info(ChatColor.AQUA + "CrystalHello has been stopped by the server.");
 	}
 
-	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		
 		if(cmd.getName().equalsIgnoreCase("crystal") && args.length == 0){
+			Bukkit.broadcastMessage(ChatColor.RED + "Debug: Testing Custom Colors: "
+		+ "\nSuccesful Color:" + this.getConfig().getString("successful-color").trim() + "\nFailed Color:" + this.getConfig().getString("failed-color").trim());
 
-			if (isPlayer(sender)){
+			if (isPlayer(sender)){//isPlayer
 				Player player = (Player) sender;
 				Material itemType = Material.getMaterial(this.getConfig().getString("required-item"));
 				boolean required = this.getConfig().getBoolean("require-item");
 				int amount = this.getConfig().getInt("amount-required");
-				PlayerInventory inv = player.getInventory();
-				Bukkit.broadcastMessage(ChatColor.DARK_RED + "Debug: Number of items that should be used: " + amount);
-				Bukkit.broadcastMessage(ChatColor.DARK_RED + "Debug: boolean required that should be used: " + required);
-				Bukkit.broadcastMessage(ChatColor.DARK_RED + "Debug: Player that should be used: " + player.toString());
-				Bukkit.broadcastMessage(ChatColor.DARK_RED + "Debug: Type of Material that should be used: " + itemType.toString());
-
+				
+				
 				if (player.hasPermission("crystalhello.greetings")) {//permissions start
+					Bukkit.broadcastMessage(ChatColor.RED + "Debug Checkpoint: Player has permissions");
+
 					if (required) {//required
+						Bukkit.broadcastMessage(ChatColor.RED + "Debug Checkpoint: Item is required");
+
 						if (player.getItemInHand().getType().equals(itemType.toString())) {
-							removeItem(inv, itemType, amount);
-							Bukkit.broadcastMessage(ChatColor.BLUE + this.getConfig().getString("successful-message") + player.getName() + "!");
-						} 
-						else {
-							player.sendMessage(ChatColor.RED + this.getConfig().getString("failed-message"));
+							Bukkit.broadcastMessage(ChatColor.RED + "Debug Checkpoint: Player has item in hand");
+							removeCrystalItem(player, itemType, amount);
+							Bukkit.broadcastMessage(ChatColor.valueOf(this.getConfig().getString("successful-color").trim()) + this.getConfig().getString("successful-message") + player.getName() + "!");
+							return true;
+						} else {
+							Bukkit.broadcastMessage(ChatColor.DARK_RED + "Debug Checkpoint: The failed/else statement was fired. :/ Problem is in .required.");
+							player.sendMessage(ChatColor.valueOf(this.getConfig().getString("failed-color").trim()) + this.getConfig().getString("failed-message"));
 							return false;
 						}
 					}//required ends
+
 					else if (!required) {//not required
-						Bukkit.broadcastMessage(ChatColor.BLUE + this.getConfig().getString("successful-message") + player.getName() + "!");
+						Bukkit.broadcastMessage(ChatColor.valueOf(this.getConfig().getString("successful-color").trim()) + this.getConfig().getString("successful-message") + player.getName() + "!");
 						return true;
 					}//not required ends
-
-					else if (cmd.getName().equalsIgnoreCase("crystal") && args.length == 1 && args[0].equalsIgnoreCase("reload")) {
-						if(player.isOp()){
-							this.reloadConfig();
-							player.sendMessage(ChatColor.GRAY + "Configuration reloaded!");
-							return true;
-						}
-						return false;
-					}
-					return false;
 				}//permissions end
-			}
-			return false;
-		}
-		return false;
-	}
-
-	public static void removeItem(PlayerInventory inventory, Material itemType, int amount) {
-		if (amount <= 0) return;
-		int size = inventory.getSize();
-		for (int slot = 0; slot < size; slot++) {
-			ItemStack is = inventory.getItem(slot);
-			if (is == null) continue;
-			if (itemType == is.getType()) {
-				int newAmount = is.getAmount() - amount;
-				if (newAmount > 0) {
-					is.setAmount(newAmount);
-					inventory.setItem(newAmount, is);
-					break;
+			} //isPlayer end
+			//outside: isPlayerCheck && within: onCommand\first command if statement
+			
+			else if (cmd.getName().equalsIgnoreCase("crystal") && args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+				crystalReload(cmd, sender, args); //Leave this here, it (only puts out text) is just to check and see if I can use a method instead.
+				Bukkit.broadcastMessage(ChatColor.DARK_RED + "Debug Checkpoint: reload method was called");
+				if(sender.isOp()){
+					this.reloadConfig();
+					sender.sendMessage(ChatColor.GRAY + "Configuration reloaded!");
+					return true;
 				} else {
-					inventory.clear(slot);
-					amount = -newAmount;
-					inventory.setItem(newAmount, is);
-					if (amount == 0) break;
+					sender.sendMessage(ChatColor.valueOf(this.getConfig().getString("failed-color").trim()) + "Only ops can use that command.");
+					return false;
 				}
-			}
+			}//reload end
+			return false;
+		}//first command end
+		return false;
+	}//method end
+
+	public static void removeCrystalItem(Player player, Material itemType, int amount) {
+		Bukkit.broadcastMessage(ChatColor.DARK_RED + "Debug Checkpoint: Remove item method was called");
+		int currentAmount = player.getItemInHand().getAmount();
+		int newAmount = currentAmount - amount;
+		if (newAmount > 1) {
+			player.getItemInHand().setAmount(newAmount);
+			Bukkit.broadcastMessage(ChatColor.DARK_RED + "Debug Checkpoint: Reached code to remove item(s) - Did inventory update?");
+		} 
+		else {
+			player.setItemInHand(null);
+			Bukkit.broadcastMessage(ChatColor.DARK_RED + "Debug Checkpoint: Reached code to erase a single remaining item - Did inventory update?");
 		}
 	}
 
 	public boolean isPlayer(CommandSender sender) {
 		if(!(sender instanceof Player)){
-			sender.sendMessage(ChatColor.RED + "You must be a player to use this command.");
+			sender.sendMessage(ChatColor.valueOf(this.getConfig().getString("failed-color").trim()) + "You must be a player to use this command.");
 			return false;
 		} else{
 			return true;
 		}		
 	}
+	
+	//Has been changed for debugging purposes
+	public void crystalReload(Command cmd, CommandSender sender, String[] args){
+		Bukkit.broadcastMessage(ChatColor.DARK_RED + "Debug Checkpoint: reload method was called (the method version)");
+		if(sender.isOp()){
+			//this.reloadConfig();
+			sender.sendMessage(ChatColor.GRAY + "Configuration reloaded! (Fake reloaded - just testing if method fires)");
+			return;//after debug session on dev server change to: true
+		}
+		else {
+			return;//after debug session on dev server change to: false
+		}
+	}
 }
+
