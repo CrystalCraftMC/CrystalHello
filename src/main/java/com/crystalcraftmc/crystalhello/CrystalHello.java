@@ -35,7 +35,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 
-public class CrystalHelloTestVersion extends JavaPlugin {
+public class CrystalHello extends JavaPlugin {
 
 	public void onEnable() {
 		getLogger().info(ChatColor.AQUA + "CrystalHello has been initialized!");
