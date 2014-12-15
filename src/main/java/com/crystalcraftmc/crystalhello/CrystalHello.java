@@ -31,10 +31,10 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.java.JavaPlugin;
+
 import java.io.File;
 
 public class CrystalHello extends JavaPlugin {
@@ -64,7 +64,7 @@ public class CrystalHello extends JavaPlugin {
 				Material itemType = Material.getMaterial(this.getConfig().getString("required-item"));
 				boolean required = this.getConfig().getBoolean("require-item");
 				int amount = this.getConfig().getInt("amount-required");
-				Inventory inv = player.getInventory();
+				PlayerInventory inv = player.getInventory();
 				Bukkit.broadcastMessage(ChatColor.DARK_RED + "Debug: Number of items that should be used: " + amount);
 				Bukkit.broadcastMessage(ChatColor.DARK_RED + "Debug: boolean required that should be used: " + required);
 				Bukkit.broadcastMessage(ChatColor.DARK_RED + "Debug: Player that should be used: " + player.toString());
@@ -102,7 +102,7 @@ public class CrystalHello extends JavaPlugin {
 		return false;
 	}
 
-	public static void removeItem(Inventory inventory, Material itemType, int amount) {
+	public static void removeItem(PlayerInventory inventory, Material itemType, int amount) {
 		if (amount <= 0) return;
 		int size = inventory.getSize();
 		for (int slot = 0; slot < size; slot++) {
@@ -112,10 +112,12 @@ public class CrystalHello extends JavaPlugin {
 				int newAmount = is.getAmount() - amount;
 				if (newAmount > 0) {
 					is.setAmount(newAmount);
+					inventory.setItem(newAmount, is);
 					break;
 				} else {
 					inventory.clear(slot);
 					amount = -newAmount;
+					inventory.setItem(newAmount, is);
 					if (amount == 0) break;
 				}
 			}
