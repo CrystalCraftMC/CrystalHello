@@ -64,6 +64,7 @@ public class CrystalHello extends JavaPlugin {
 				Material itemType = Material.getMaterial(this.getConfig().getString("required-item"));
 				boolean required = this.getConfig().getBoolean("require-item");
 				int amount = this.getConfig().getInt("amount-required");
+				Inventory inv = player.getInventory();
 				Bukkit.broadcastMessage(ChatColor.DARK_RED + "Debug: Number of items that should be used: " + amount);
 				Bukkit.broadcastMessage(ChatColor.DARK_RED + "Debug: boolean required that should be used: " + required);
 				Bukkit.broadcastMessage(ChatColor.DARK_RED + "Debug: Player that should be used: " + player.toString());
@@ -72,16 +73,16 @@ public class CrystalHello extends JavaPlugin {
 				if (player.hasPermission("crystalhello.greetings")) {//permissions start
 					if (required) {//required
 						if (player.getItemInHand().getType().equals(itemType.toString())) {
-							removeItem(player.getInventory(), itemType, amount);
-							Bukkit.broadcastMessage(ChatColor.valueOf("successful-color") + this.getConfig().getString("successful-message") + player.getName() + "!");
+							removeItem(inv, itemType, amount);
+							Bukkit.broadcastMessage(ChatColor.BLUE + this.getConfig().getString("successful-message") + player.getName() + "!");
 						} 
 						else {
-							player.sendMessage(ChatColor.valueOf("failed-color") + this.getConfig().getString("failed-message"));
+							player.sendMessage(ChatColor.RED + this.getConfig().getString("failed-message"));
 							return false;
 						}
 					}//required ends
 					else if (!required) {//not required
-						Bukkit.broadcastMessage(ChatColor.valueOf("successful-color") + this.getConfig().getString("successful-message") + player.getName() + "!");
+						Bukkit.broadcastMessage(ChatColor.BLUE + this.getConfig().getString("successful-message") + player.getName() + "!");
 						return true;
 					}//not required ends
 
@@ -123,7 +124,7 @@ public class CrystalHello extends JavaPlugin {
 
 	public boolean isPlayer(CommandSender sender) {
 		if(!(sender instanceof Player)){
-			sender.sendMessage("You must be a player to use this command.");
+			sender.sendMessage(ChatColor.RED + "You must be a player to use this command.");
 			return false;
 		} else{
 			return true;
