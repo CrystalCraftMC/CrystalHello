@@ -1,6 +1,6 @@
 # Configure CrystalHello below.
 require-item: true
-required-item: ICE #name = ALL_CAPS
+required-item: ice #name = ALL_CAPS
 amount-required: 1 #the absolute value of the items that will be used up upon command.
 successful-message: CrystalCraftMC has decided to grant the wish trapped deepest in your heart:\nHello, #Player's name will be added here inside the code + "!"
 failed-message: You are holding the wrong key. Please try again, and may the odds be ever in your favor! #I dont know just a thought.
