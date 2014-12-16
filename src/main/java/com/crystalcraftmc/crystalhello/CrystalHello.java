@@ -32,65 +32,87 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import java.io.File;
 
-
 public class CrystalHello extends JavaPlugin {
-    public void onEnable() {
-        getLogger().info(ChatColor.AQUA + "CrystalHello has been initialized!");
 
-        // Here, we are checking to see if a config.yml already exists. If no, generate a new one!
-        try {
-            File database = new File(getDataFolder(), "config.yml");
-            if (!database.exists()) saveDefaultConfig();
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-    }
+	public void onEnable() {
+		getLogger().info(ChatColor.AQUA + "CrystalHello has been initialized!");
+		// Here, we are checking to see if a config.yml already exists. If no, generate a new one!
+		try {
+			File database = new File(getDataFolder(), "config.yml");
+			if (!database.exists()) saveDefaultConfig();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+	}
 
-    public void onDisable() {
-        getLogger().info(ChatColor.AQUA + "CrystalHello has been stopped by the server.");
-    }
+	public void onDisable() {
+		getLogger().info(ChatColor.AQUA + "CrystalHello has been stopped by the server.");
+	}
 
-    // So far: basic online of a few main command checks and (hopefully)
-    /// some code that will determine whether player is holding ice.
-	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
-		//----------------------------COMMAND (1 of 4)-----------------------------
-		if(cmd.getName().equalsIgnoreCase("crystal")){
-
-			//-----------------------NON-PLAYER (2 of 4)---------------------------
-			if(!(sender instanceof Player)){
-				//maybe additional statements
-				sender.sendMessage("You must be a player to use this command.");
-				return false;
-			} 
-			//------------------------PLAYER (3 of 4) [and] ICE Check (4 of 4)---------------------------
-			//Note there is no specific check for (sender instanceof Player) Just the confirmation that it is not- a non-player
-			else {
+		if(cmd.getName().equalsIgnoreCase("crystal") && args.length == 0){
+			if (isPlayer(sender)){//isPlayer
 				Player player = (Player) sender;
-				//REQUIRE PERMISSIONS
-				//REQUIRE ITEM: FALSE (1 of 2)
+				Material itemType = Material.getMaterial(this.getConfig().getString("required-item").toUpperCase().trim());
+				boolean required = this.getConfig().getBoolean("require-item");
+				int amount = this.getConfig().getInt("amount-required");
 				if (player.hasPermission("crystalhello.greetings")) {
-					if (this.getConfig().getBoolean("require-item")) {
-						if (player.getItemInHand().getType().equals(Material.getMaterial(this.getConfig().getString("required-item")))) {
-							Bukkit.broadcastMessage(ChatColor.AQUA + "CrystalCraftMC has decided to grant the wish trapped deepest in your heart:\n" + "Hello, " + player.getName() + "!");
+					if (required) {
+						if (player.getItemInHand().getType().equals(itemType)) {
+							removeCrystalItem(player, itemType, amount);
+							Bukkit.broadcastMessage(ChatColor.valueOf(this.getConfig().getString("successful-color").toUpperCase().trim()) + this.getConfig().getString("successful-message") + player.getName() + "!");
 							return true;
 						} else {
-							player.sendMessage(ChatColor.RED + "This command requires icy hands, not an icy heart!");
+							player.sendMessage(ChatColor.valueOf(this.getConfig().getString("failed-color").toUpperCase().trim()) + this.getConfig().getString("failed-message"));
 							return false;
 						}
 					}
-					//REQUIRE ITEM: TRUE (2 of 2)
-					else if (!this.getConfig().getBoolean("require-item")) {
-						Bukkit.broadcastMessage(ChatColor.AQUA + "CrystalCraftMC has decided to grant the wish trapped deepest in your heart:\n" + "Hello, " + player.getName() + "!");
+					else if (!required) {
+						Bukkit.broadcastMessage(ChatColor.valueOf(this.getConfig().getString("successful-color").toUpperCase().trim()) + this.getConfig().getString("successful-message") + player.getName() + "!");
 						return true;
 					}
 				}
-			}
+			} 
+			return false;
+		}
+		else if (cmd.getName().equalsIgnoreCase("crystal") && args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+			return (crystalReload(cmd, sender, args));
 		}
 		return false;
 	}
+
+	public static void removeCrystalItem(Player player, Material itemType, int amount) {
+		int currentAmount = player.getItemInHand().getAmount();
+		int newAmount = currentAmount - amount;
+		if (newAmount > 1) {
+			player.getItemInHand().setAmount(newAmount);
+		} 
+		else {
+			player.setItemInHand(null);
+		}
+	}
+
+	public boolean isPlayer(CommandSender sender) {
+		if(!(sender instanceof Player)){
+			sender.sendMessage(ChatColor.valueOf(this.getConfig().getString("failed-color").toUpperCase().trim()) + "You must be a player to use this command.");
+			return false;
+		} else{
+			return true;
+		}		
+	}
+
+	public boolean crystalReload(Command cmd, CommandSender sender, String[] args){
+		if(sender.isOp()){
+			this.reloadConfig();
+			sender.sendMessage(ChatColor.GRAY + "Configuration reloaded!");
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 }
+
