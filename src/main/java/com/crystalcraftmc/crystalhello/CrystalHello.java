@@ -95,28 +95,27 @@ public class CrystalHello extends JavaPlugin {
 	public static void removeCrystalItem(Player player, Material itemType, int amountToRemove) {
 		Inventory inv = player.getInventory();
 		int leftToRemove = amountToRemove;
-		ItemStack toRemove = new ItemStack(itemType);
 		for( int i = 0 ; i < inv.getSize() ; i++ ){
 			ItemStack invSlot = inv.getItem(i);
-			
+			ItemStack toRemove = new ItemStack(itemType);
+
 			if (!invSlot.getType().equals(toRemove.getType())) continue;
 			else if (invSlot.getType().equals(toRemove.getType())) {
-				if(leftToRemove >= 0){//if more to remove then...
+				if(leftToRemove > 0){//if more to remove then...
 					if(invSlot.getAmount() < leftToRemove){//if found
 						leftToRemove -= invSlot.getAmount();
 						inv.clear(i);
+						continue;
 					} else if (invSlot.getAmount() == leftToRemove){
 						leftToRemove -= invSlot.getAmount();
-						leftToRemove = 0;
 						inv.clear(i);
+						leftToRemove = 0;
 						continue;
 					} else if (invSlot.getAmount() > leftToRemove){
-						if(leftToRemove == 0) break;
-						else if (leftToRemove != 0) {
 						invSlot.setAmount((invSlot.getAmount() - leftToRemove));
-						break;
-						}
-					}
+						leftToRemove = 0;
+						continue;
+					} else break;
 				}
 			}
 		}
