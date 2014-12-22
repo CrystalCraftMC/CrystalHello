@@ -23,7 +23,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-//package com.crystalcraftmc.crystalhello;
+package com.crystalcraftmc.crystalhello;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
