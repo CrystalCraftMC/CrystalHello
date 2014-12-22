@@ -23,7 +23,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.crystalcraftmc.crystalhello;
+//package com.crystalcraftmc.crystalhello;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -31,7 +31,10 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+
 import java.io.File;
 
 public class CrystalHello extends JavaPlugin {
@@ -62,9 +65,14 @@ public class CrystalHello extends JavaPlugin {
 				if (player.hasPermission("crystalhello.greetings")) {
 					if (required) {
 						if (player.getItemInHand().getType().equals(itemType)) {
-							removeCrystalItem(player, itemType, amount);
-							Bukkit.broadcastMessage(ChatColor.valueOf(this.getConfig().getString("successful-color").toUpperCase().trim()) + this.getConfig().getString("successful-message") + player.getName() + "!");
-							return true;
+							if (enoughItems(player, itemType, amount)) {
+								removeCrystalItem(player, itemType, amount);
+								Bukkit.broadcastMessage(ChatColor.valueOf(this.getConfig().getString("successful-color").toUpperCase().trim()) + this.getConfig().getString("successful-message") + player.getName() + "!");
+								return true;
+							} else {
+								player.sendMessage(ChatColor.valueOf(this.getConfig().getString("failed-color").toUpperCase().trim()) + this.getConfig().getString("lacking-quantity"));
+								return false;
+							}
 						} else {
 							player.sendMessage(ChatColor.valueOf(this.getConfig().getString("failed-color").toUpperCase().trim()) + this.getConfig().getString("failed-message"));
 							return false;
@@ -84,14 +92,29 @@ public class CrystalHello extends JavaPlugin {
 		return false;
 	}
 
-	public static void removeCrystalItem(Player player, Material itemType, int amount) {
-		int currentAmount = player.getItemInHand().getAmount();
-		int newAmount = currentAmount - amount;
-		if (newAmount > 1) {
-			player.getItemInHand().setAmount(newAmount);
-		} 
-		else {
-			player.setItemInHand(null);
+	public static void removeCrystalItem(Player player, Material itemType, int amountToRemove) {
+		Inventory inv = player.getInventory();
+		int leftToRemove = amountToRemove;
+		for( int i = 0 ; i < inv.getSize() ; i++ ){
+			ItemStack invSlot = inv.getItem(i);
+			ItemStack toRemove = new ItemStack(itemType);
+
+			if (!invSlot.getType().equals(toRemove.getType()) || invSlot == null) continue;
+			else if (invSlot.getType().equals(toRemove.getType())) {
+				if(leftToRemove >= 0){//if more to remove then...
+					if(invSlot.getAmount() < leftToRemove){//if found
+						leftToRemove -= invSlot.getAmount();
+						inv.clear(i);
+					} else if (invSlot.getAmount() == leftToRemove){
+						leftToRemove -= invSlot.getAmount();
+						inv.clear(i);
+						break;
+					} else if (invSlot.getAmount() > leftToRemove){
+						invSlot.setAmount((invSlot.getAmount() - leftToRemove));
+						break;
+					}
+				}
+			}
 		}
 	}
 
@@ -114,5 +137,24 @@ public class CrystalHello extends JavaPlugin {
 			return false;
 		}
 	}
-}
 
+	public boolean enoughItems(Player player, Material itemType, int amountToRemove){
+		Inventory inv = player.getInventory(); 
+			int tally = 0;
+			ItemStack toCount = new ItemStack(itemType);
+			for (int i = 0; i < inv.getSize(); i++){
+				ItemStack invSlot = inv.getItem(i);
+				if( invSlot == null) continue;
+				else if (!invSlot.getType().equals(toCount.getType())) continue;
+				else if (invSlot.getType().equals(toCount.getType())) tally += invSlot.getAmount();
+				else break;
+			}
+			if (tally < amountToRemove){
+			return false;
+			} 
+			else if (tally >= amountToRemove){
+				return true;
+			}
+		return false;
+	}
+}
