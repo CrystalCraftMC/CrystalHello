@@ -142,22 +142,14 @@ public class CrystalHello extends JavaPlugin {
 	}
 
 	public boolean enoughItems(Player player, Material itemType, int amountToRemove){
-		Inventory inv = player.getInventory(); 
-			int tally = 0;
-			ItemStack toCount = new ItemStack(itemType);
-			for (int i = 0; i < inv.getSize(); i++){
-				ItemStack invSlot = inv.getItem(i);
-				if( invSlot == null) continue;
-				else if (!invSlot.getType().equals(toCount.getType())) continue;
-				else if (invSlot.getType().equals(toCount.getType())) tally += invSlot.getAmount();
-				else break;
+		ItemStack item = new ItemStack(itemType);
+		int tally = 0;
+		for (ItemStack i : player.getInventory()) {
+			if (i.getType() == item.getType()) {
+				tally += i.getAmount();
 			}
-			if (tally < amountToRemove){
-			return false;
-			} 
-			else if (tally >= amountToRemove){
-				return true;
-			}
+		}
+		if (tally >= amountToRemove) return true;
 		return false;
 	}
 }
