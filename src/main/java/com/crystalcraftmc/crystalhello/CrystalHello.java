@@ -26,6 +26,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 
+/**
+ * This class is the main class and the only class of the entire plugin. <br />
+ * The purpose of this plugin is to make the server say hello to you or perhaps take some of your items depending on
+ * how it's feeling! This plugin is a great tutorial for getting started in the world of Java and Spigot plugins.
+ *
+ * @author Justin W. Flory
+ * @author Ivan Frasure
+ */
 public class CrystalHello extends JavaPlugin {
 
 	public void onEnable() {
