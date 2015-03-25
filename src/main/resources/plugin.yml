@@ -1,8 +1,8 @@
 name: CrystalHello
 main: com.crystalcraftmc.crystalhello.CrystalHello
-version: ${version}
+version: 1.0.1
 description: Have the server say hello when you type the command and hold an item!
-authors: [jflory7, Jacc734, devastator10k]
+authors: [jflory7, Jacc734]
 website: http://crystalcraftmc.com
 
 commands:
