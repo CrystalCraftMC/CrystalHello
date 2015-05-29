@@ -1,4 +1,4 @@
-CrystalHello
+CrystalHello [![Build Status](https://travis-ci.org/CrystalCraftMC/CrystalHello.svg)](https://travis-ci.org/CrystalCraftMC/CrystalHello)
 ============
 
 This simple plugin will say "Hello" to you when you meet a few basic requirements!
